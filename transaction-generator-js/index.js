@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions/add';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions/add-many';
 const INTERVAL = 5000; // 5 seconds
 
 const cities = [
@@ -68,21 +68,32 @@ async function sendTransaction(transaction) {
   }
 }
 
+async function sendBatchTransactions(transactions) {
+  try {
+    const response = await axios.post(BACKEND_URL, transactions);
+    console.log(`✓ Batch of ${transactions.length} transactions sent successfully`);
+    response.data.forEach(t => {
+      console.log(`  - ID ${t.id}: ${t.city} - ${t.type} - ${t.price} SAR`);
+    });
+  } catch (error) {
+    console.error(`✗ Failed to send batch: ${error.message}`);
+  }
+}
+
 function startGenerator() {
   console.log('Transaction Generator Started');
   console.log(`Backend URL: ${BACKEND_URL}`);
-  console.log(`Generating transactions every ${INTERVAL / 1000} seconds...\n`);
+  console.log(`Generating 10 transactions every ${INTERVAL / 1000} seconds...\n`);
 
-  // Send first transaction immediately
-  const transaction = generateTransaction();
-  sendTransaction(transaction);
+  // Send first batch immediately
+  const transactions = Array.from({ length: 10 }, () => generateTransaction());
+  sendBatchTransactions(transactions);
 
   // Then send every 5 seconds
   setInterval(() => {
-    const transaction = generateTransaction();
-    sendTransaction(transaction);
+    const transactions = Array.from({ length: 10 }, () => generateTransaction());
+    sendBatchTransactions(transactions);
   }, INTERVAL);
 }
 
 startGenerator();
-
