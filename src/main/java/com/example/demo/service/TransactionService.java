@@ -5,7 +5,6 @@ import com.example.demo.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,12 +17,12 @@ public class TransactionService {
     }
 
     public Transaction saveTransaction(Transaction transaction) {
-        // Ensure time is set if not provided? Or trust the generator.
-        // Assuming generator provides time, but we can set it here if null.
-        if (transaction.getTime() == null) {
-            transaction.setTime(LocalDateTime.now());
-        }
+        // Time is handled by @CreationTimestamp
         return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> saveTransactions(List<Transaction> transactions) {
+        return transactionRepository.saveAll(transactions);
     }
 
     public List<Transaction> getLatestTransactions() {

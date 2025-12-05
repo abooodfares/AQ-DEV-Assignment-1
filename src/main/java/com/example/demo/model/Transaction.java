@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,9 +16,15 @@ public class Transaction {
     private String cityCode;
     private Double lat;
     private Double lng;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime time;
+
     private Double price;
-    private String type; // Land, Villa, Apartment
+
+    @Enumerated(EnumType.STRING)
+    private TransactionType type; // Land, Villa, Apartment
 
     // Getters and Setters
 
@@ -77,11 +84,11 @@ public class Transaction {
         this.price = price;
     }
 
-    public String getType() {
+    public TransactionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TransactionType type) {
         this.type = type;
     }
 }
