@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions/add';
 const INTERVAL = 5000; // 5 seconds
 
 const cities = [
@@ -17,7 +16,7 @@ const cities = [
   { name: 'Khamis Mushait', code: '017', lat: 18.3000, lng: 42.7333 }
 ];
 
-const propertyTypes = ['LAND', 'VILLA', 'APARTMENT'];
+const propertyTypes = ['Land', 'Villa', 'Apartment'];
 
 function randomElement(array) {
   return array[Math.floor(Math.random() * array.length)];
@@ -34,11 +33,11 @@ function generateCoordinates(city) {
 
 function generatePrice(type) {
   switch (type) {
-    case 'LAND':
+    case 'Land':
       return 100000 + Math.random() * 900000;
-    case 'VILLA':
+    case 'Villa':
       return 500000 + Math.random() * 2500000;
-    case 'APARTMENT':
+    case 'Apartment':
       return 200000 + Math.random() * 800000;
     default:
       return 100000;
@@ -48,13 +47,13 @@ function generatePrice(type) {
 function generateTransaction() {
   const city = randomElement(cities);
   const type = randomElement(propertyTypes);
-  
+  const coords = generateCoordinates(city);
+
   return {
-    id: uuidv4(),
     city: city.name,
     cityCode: city.code,
-    coordinates: generateCoordinates(city),
-    time: new Date().toISOString(),
+    lat: coords.lat,
+    lng: coords.lng,
     price: generatePrice(type),
     type: type
   };
@@ -62,8 +61,8 @@ function generateTransaction() {
 
 async function sendTransaction(transaction) {
   try {
-    await axios.post(BACKEND_URL, transaction);
-    console.log(`✓ Transaction sent: ${transaction.id} - ${transaction.city} - ${transaction.type} - ${transaction.price.toFixed(2)} SAR`);
+    const response = await axios.post(BACKEND_URL, transaction);
+    console.log(`✓ Transaction sent: ID ${response.data.id} - ${transaction.city} - ${transaction.type} - ${transaction.price.toFixed(2)} SAR`);
   } catch (error) {
     console.error(`✗ Failed to send transaction: ${error.message}`);
   }
@@ -73,11 +72,11 @@ function startGenerator() {
   console.log('Transaction Generator Started');
   console.log(`Backend URL: ${BACKEND_URL}`);
   console.log(`Generating transactions every ${INTERVAL / 1000} seconds...\n`);
-  
+
   // Send first transaction immediately
   const transaction = generateTransaction();
   sendTransaction(transaction);
-  
+
   // Then send every 5 seconds
   setInterval(() => {
     const transaction = generateTransaction();
@@ -86,3 +85,4 @@ function startGenerator() {
 }
 
 startGenerator();
+
