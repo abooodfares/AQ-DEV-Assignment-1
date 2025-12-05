@@ -59,14 +59,6 @@ function generateTransaction() {
   };
 }
 
-async function sendTransaction(transaction) {
-  try {
-    const response = await axios.post(BACKEND_URL, transaction);
-    console.log(`✓ Transaction sent: ID ${response.data.id} - ${transaction.city} - ${transaction.type} - ${transaction.price.toFixed(2)} SAR`);
-  } catch (error) {
-    console.error(`✗ Failed to send transaction: ${error.message}`);
-  }
-}
 
 async function sendBatchTransactions(transactions) {
   try {
