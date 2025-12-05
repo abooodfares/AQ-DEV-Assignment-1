@@ -4,8 +4,11 @@ import com.example.demo.model.Transaction;
 import com.example.demo.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -18,7 +21,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    private final java.util.List<org.springframework.web.servlet.mvc.method.annotation.SseEmitter> emitters = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     @PostMapping("/add")
     public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction) {
@@ -35,9 +38,8 @@ public class TransactionController {
     }
 
     @GetMapping("/stream")
-    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter streamTransactions() {
-        org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter = new org.springframework.web.servlet.mvc.method.annotation.SseEmitter(
-                Long.MAX_VALUE);
+    public SseEmitter streamTransactions() {
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         emitters.add(emitter);
         emitter.onCompletion(() -> emitters.remove(emitter));
         emitter.onTimeout(() -> emitters.remove(emitter));
@@ -45,10 +47,10 @@ public class TransactionController {
     }
 
     private void broadcast(Transaction transaction) {
-        for (org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter : emitters) {
+        for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(transaction);
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
                 emitters.remove(emitter);
             }
         }

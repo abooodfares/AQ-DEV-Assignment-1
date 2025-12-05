@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +23,7 @@ public class Transaction {
     @Column(updatable = false)
     private LocalDateTime time;
 
-    private Double price;
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     private TransactionType type; // Land, Villa, Apartment
@@ -76,11 +78,11 @@ public class Transaction {
         this.time = time;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
