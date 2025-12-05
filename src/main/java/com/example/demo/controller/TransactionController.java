@@ -41,12 +41,21 @@ public class TransactionController {
     public SseEmitter streamTransactions() {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         emitters.add(emitter);
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
+        System.out.println("Client connected per SSE. Total emitters: " + emitters.size());
+
+        emitter.onCompletion(() -> {
+            emitters.remove(emitter);
+            System.out.println("Emitter completed. Total emitters: " + emitters.size());
+        });
+        emitter.onTimeout(() -> {
+            emitters.remove(emitter);
+            System.out.println("Emitter timed out. Total emitters: " + emitters.size());
+        });
         return emitter;
     }
 
     private void broadcast(Transaction transaction) {
+        System.out.println("Broadcasting transaction " + transaction.getId() + " to " + emitters.size() + " clients");
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(transaction);

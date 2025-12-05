@@ -1,0 +1,107 @@
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.status {
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.connected {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  /* Explicitly set text color to black/dark gray */
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #444;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+.price {
+  font-family: monospace;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.villa {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.apartment {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.land {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
