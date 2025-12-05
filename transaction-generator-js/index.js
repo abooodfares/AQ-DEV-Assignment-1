@@ -1,4 +1,4 @@
-import axios from 'axios';
+
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions/add';
 const INTERVAL = 5000; // 5 seconds
@@ -62,8 +62,20 @@ function generateTransaction() {
 
 async function sendTransaction(transaction) {
   try {
-    const response = await axios.post(BACKEND_URL, transaction);
-    console.log(`✓ Transaction sent: ID ${response.data.id} - ${transaction.city} - ${transaction.type} - ${transaction.price.toFixed(2)} SAR`);
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(transaction)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`✓ Transaction sent: ID ${data.id} - ${transaction.city} - ${transaction.type} - ${transaction.price.toFixed(2)} SAR`);
   } catch (error) {
     console.error(`✗ Failed to send transaction: ${error.message} `);
   }
