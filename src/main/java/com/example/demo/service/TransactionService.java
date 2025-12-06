@@ -5,12 +5,18 @@ import com.example.demo.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    // is singleton becuse of @Service
+    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -18,17 +24,34 @@ public class TransactionService {
 
     public Transaction saveTransaction(Transaction transaction) {
         // Time is handled by @CreationTimestamp
-        return transactionRepository.save(transaction);
+        Transaction saved = transactionRepository.save(transaction);
+        broadcast(saved);
+        return saved;
     }
 
     public List<Transaction> saveTransactions(List<Transaction> transactions) {
-        return transactionRepository.saveAll(transactions);
+        List<Transaction> saved = transactionRepository.saveAll(transactions);
+        saved.forEach(this::broadcast);
+        return saved;
     }
 
-    public List<Transaction> getLatestTransactions() {
-        // Return all or limit? The requirement just says "returns the latest
-        // transactions".
-        // Let's sort by time descending.
-        return transactionRepository.findAll(Sort.by(Sort.Direction.DESC, "time"));
+    public void addEmitter(SseEmitter emitter) {
+        emitters.add(emitter);
     }
+
+    public void removeEmitter(SseEmitter emitter) {
+        emitters.remove(emitter);
+    }
+
+    private void broadcast(Transaction transaction) {
+        System.out.println("Broadcasting transaction " + transaction.getId() + " to " + emitters.size() + " clients");
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(transaction);
+            } catch (IOException e) {
+                emitters.remove(emitter);
+            }
+        }
+    }
+
 }
