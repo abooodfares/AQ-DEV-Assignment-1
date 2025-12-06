@@ -1,6 +1,6 @@
 
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions/add';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api/transactions/add-many';
 const INTERVAL = 5000; // 5 seconds
 
 const cities = [
@@ -60,14 +60,14 @@ function generateTransaction() {
 }
 
 
-async function sendTransaction(transaction) {
+async function sendTransaction(transactions) {
   try {
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(transaction)
+      body: JSON.stringify(transactions)
     });
 
     if (!response.ok) {
@@ -75,10 +75,19 @@ async function sendTransaction(transaction) {
     }
 
     const data = await response.json();
-    console.log(`✓ Transaction sent: ID ${data.id} - ${transaction.city} - ${transaction.type} - ${transaction.price.toFixed(2)} SAR`);
+    console.log(`✓ Sent ${transactions.length} transactions successfully`);
   } catch (error) {
-    console.error(`✗ Failed to send transaction: ${error.message} `);
+    console.error(`✗ Failed to send transactions: ${error.message} `);
   }
+}
+
+async function sendTransactions() {
+  const transactions = [];
+  for (let i = 0; i < 10; i++) {
+    const transaction = generateTransaction();
+    transactions.push(transaction);
+  }
+  await sendTransaction(transactions);
 }
 
 function startGenerator() {
@@ -86,14 +95,11 @@ function startGenerator() {
   console.log(`Backend URL: ${BACKEND_URL} `);
   console.log(`Generating transactions every ${INTERVAL / 1000} seconds...\n`);
 
-  // Send first transaction immediately
-  const transaction = generateTransaction();
-  sendTransaction(transaction);
+  sendTransactions();
 
   // Then send every 5 seconds
   setInterval(() => {
-    const transaction = generateTransaction();
-    sendTransaction(transaction);
+    sendTransactions();
   }, INTERVAL);
 }
 
