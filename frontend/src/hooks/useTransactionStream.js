@@ -4,6 +4,7 @@ export function useTransactionStream() {
     const [transactions, setTransactions] = useState([]);
     const [connectionStatus, setConnectionStatus] = useState('Connecting...');
 
+    
     useEffect(() => {
         const eventSource = new EventSource('http://localhost:8080/api/transactions/latestTransactions');
 
