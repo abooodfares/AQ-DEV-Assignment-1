@@ -1,7 +1,9 @@
-package com.example.demo.model;
+package com.example.demo.models;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.example.demo.models.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

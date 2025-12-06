@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Transaction;
+import com.example.demo.models.Transaction;
 import com.example.demo.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;

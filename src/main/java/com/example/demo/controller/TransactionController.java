@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ApiResponse;
-import com.example.demo.model.Transaction;
+import com.example.demo.models.Transaction;
 import com.example.demo.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
