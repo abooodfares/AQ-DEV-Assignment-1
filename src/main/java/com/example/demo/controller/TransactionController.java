@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.model.Transaction;
 import com.example.demo.service.TransactionService;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +21,28 @@ public class TransactionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction) {
-        Transaction savedTransaction = transactionService.saveTransaction(transaction);
-        return ResponseEntity.ok(savedTransaction);
+    public ResponseEntity<ApiResponse<Transaction>> addTransaction(@RequestBody Transaction transaction) {
+        try {
+            Transaction savedTransaction = transactionService.saveTransaction(transaction);
+            return ResponseEntity.ok(ApiResponse.success(savedTransaction, "Transaction added successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Failed to add transaction: " + e.getMessage(), 500));
+        }
     }
 
     @PostMapping("/add-many")
-    public ResponseEntity<List<Transaction>> addTransactions(@RequestBody List<Transaction> transactions) {
-        List<Transaction> savedTransactions = transactionService.saveTransactions(transactions);
-        return ResponseEntity.ok(savedTransactions);
+    public ResponseEntity<ApiResponse<List<Transaction>>> addTransactions(@RequestBody List<Transaction> transactions) {
+        try {
+            List<Transaction> savedTransactions = transactionService.saveTransactions(transactions);
+            return ResponseEntity.ok(ApiResponse.success(savedTransactions, "Transactions added successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Failed to add transactions: " + e.getMessage(), 500));
+        }
     }
 
-    @GetMapping("/stream")
+    @GetMapping("/latestTransactions")
     public SseEmitter streamTransactions() {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         transactionService.addEmitter(emitter);
