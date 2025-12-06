@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.example.demo.models.enums.TransactionType;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,8 +22,34 @@ public class Transaction {
 
     private String city;
     private String cityCode;
+
+    // Lat/Lng are now transient helpers for JSON api
+    @Transient
     private Double lat;
+
+    @Transient
     private Double lng;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Column(columnDefinition = "geometry(Point,4326)") // PostGIS Type
+    private Point location;
+
+    @PrePersist
+    @PreUpdate
+    public void syncLocation() {
+        if (lat != null && lng != null) {
+            GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
+            this.location = factory.createPoint(new Coordinate(lng, lat));
+        }
+    }
+
+    @PostLoad
+    public void syncLatLng() {
+        if (location != null) {
+            this.lat = location.getY(); // Latitude is Y
+            this.lng = location.getX(); // Longitude is X
+        }
+    }
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -70,6 +100,14 @@ public class Transaction {
 
     public void setLng(Double lng) {
         this.lng = lng;
+    }
+
+    public Point getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point location) {
+        this.location = location;
     }
 
     public LocalDateTime getTime() {
